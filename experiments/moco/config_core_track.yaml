@@ -1,0 +1,76 @@
+META_ARC: "siamcar_r50"
+
+
+
+#ENCODER:
+#    TYPE: "resnet50"
+
+MOCO:
+    KWARGS:
+        input_dim: 2048*4*4*4
+        mlp_dim: 2048*4*4*4
+        output_dim: 256
+        t: 0.2
+        momentum: 0.999
+TRACKER:
+    LAMBDA_SPATIAL: 0.001
+    LAMBDA_AUTOENCODER: 1.0
+    LAMBDA_ENCODER: 1.0
+    MODE: 'normal'
+    REG_IMG_SIZE: 32
+    DIS_IMG_SIZE: 64
+
+    LAMBDA_REG: 0.35
+    LAMBDA_DIS: 0.65
+
+#NECK:
+    #TYPE: 'Attn'
+
+TRAIN:
+    EPOCH: 50
+    START_EPOCH: 0
+    SAVE_EPOCH: 50
+    BATCH_SIZE: 256 # 32
+    BASE_LR: &BASE_LR 0.01
+    RESUME: ''
+
+    SNAPSHOT_DIR: './snapshot'
+
+
+#    LR:
+#        TYPE: 'multi-step'
+#        KWARGS:
+#            start_lr: *BASE_LR
+#            steps: [2, 4]
+#            #end_lr: 0.00001
+    LR:
+        LR: 0.0001
+    LR_SCHEDULER:
+        TYPE: 'Exponential'
+        KWARGS:
+            gamma: 0.97
+
+    LR_WARMUP:
+        TYPE: 'linear'
+        EPOCH: 5
+        KWARGS:
+            start_lr: 0.001
+            end_lr: 0.005
+            step: 1
+
+DATASET:
+    NAMES:
+    - 'CLUST'
+    #- 'GOT'
+    #- 'CLUST_SUPPLY'
+    # - 'CLUST_AUG'
+    NUM: 512
+    ROOT: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d"
+    JSON_PATH: '/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d/test.json'
+    LABEL_PATH: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d/test_label.json"
+    RANDOM_RANGE: 6
+    IMG_SIZE: 32
+    NORMALIZE: false
+    METHOD: '3d'
+    IN_CHANNELS: 1
+

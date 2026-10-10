@@ -1,0 +1,51 @@
+# MoCo branch distillation V3 config (student 32³)
+# Teacher: 64³ input, ResNet-50 → [B, 2048, 2, 2, 2]
+# Student: 32³ input, ResNet-18 → [B, 512, 4, 4, 4]
+
+META_ARC: "MoCo-Distillation-V3-Student32"
+CUDA: true
+
+TEACHER:
+    MOCO_PATH: "/root/data-tmp/core-track/trained_models/core-track/moco_encoder_q_resnet50_e290.pth"
+
+STUDENT:
+    IN_CHANNELS: 1
+
+TRAIN:
+    EPOCH: 300
+    BATCH_SIZE: 32
+    BASE_LR: 0.001
+    WEIGHT_DECAY: 0.0001
+    WARMUP_EPOCHS: 5
+    SAVE_EPOCH: 20
+    SNAPSHOT_DIR: "./snapshot/moco_distillation_v3_32"
+    NUM_WORKERS: 4
+    PRINT_FREQ: 5
+    GRAD_CLIP: 1.0
+
+    # distillation loss weights
+    W_FEAT: 1.0
+    W_RESPONSE: 0.5
+    W_RELATION: 0.3
+    MARGIN: 0.1
+
+    # layer-wise learning rate
+    LAYER_WISE_LR:
+        ENABLED: true
+        PROJECTION_LR_RATIO: 0.1
+
+    # learning rate schedule
+    LR_SCHEDULER:
+        TYPE: "CosineAnnealingLR"
+        KWARGS:
+            T_max: 300
+            eta_min: 1.0e-6
+
+DATASET:
+    ROOT: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d"
+    JSON_PATH: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d/test.json"
+    LABEL_PATH: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d/test_label.json"
+    IMG_SIZE: 64
+    STUDENT_IMG_SIZE: 32
+    RANDOM_RANGE: 5
+    NUM_SAMPLES: 512

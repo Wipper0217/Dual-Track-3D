@@ -1,0 +1,59 @@
+META_ARC: "Distillation-Student"
+
+CUDA: True
+
+TEACHER:
+  AE_PATH: "trained_models/core-track/ResNetAutoEncoder3D_3d_100.pth"
+  MOCO_PATH: "trained_models/core-track/moco_encoder_q_resnet50_e290.pth"
+  LAMBDA_REG: 0.2
+  LAMBDA_DIS: 0.8
+
+STUDENT:
+  IN_CHANNELS: 1
+  FEAT_DIM: 256
+
+TRAIN:
+  EPOCH: 300
+  BATCH_SIZE: 16
+  BASE_LR: 0.002
+  WEIGHT_DECAY: 0.0001
+  SAVE_EPOCH: 20
+  SNAPSHOT_DIR: "./snapshot/distillation2"
+  NUM_WORKERS: 4
+  PRINT_FREQ: 5
+
+  # distillation loss weights (increase feature and rank)
+  W_RESPONSE: 1.0
+  W_FEATURE: 0.8
+  W_RANK: 0.5
+  MARGIN: 0.3
+
+  # Warmup
+  WARMUP_EPOCHS: 10
+  MIN_LR: 1e-5
+
+  LR_SCHEDULER:
+    TYPE: 'CosineAnnealingWarmRestarts'
+    KWARGS:
+      T_0: 50
+      T_mult: 2
+      eta_min: 1.0e-5
+
+DATASET:
+  ROOT: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d"
+  JSON_PATH: '/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d/test.json'
+  LABEL_PATH: "/root/data-pub/ultrasound/3DUS/CLUST/clust_testset_3d/test_label.json"
+  IMG_SIZE: 32
+  NUM_SAMPLES_PER_FRAME: 48
+  POS_RADIUS: 2.0
+  NEG_RADIUS_MIN: 5.0
+
+TRACKER:
+  LAMBDA_SPATIAL: 0.0
+  LAMBDA_AUTOENCODER: 1.0
+  LAMBDA_ENCODER: 1.0
+  MODE: 'normal'
+  REG_IMG_SIZE: 32
+  DIS_IMG_SIZE: 32
+  LAMBDA_REG: 1.0
+  LAMBDA_DIS: 1.0
